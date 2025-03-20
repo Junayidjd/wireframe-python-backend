@@ -1,14 +1,20 @@
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 import json
-import os  # Import os module
+import os
 
 app = Flask(__name__)
 CORS(app)
 
+# Root route
+@app.route('/')
+def home():
+    return "Welcome to the Flask Backend!"
+
 @app.route('/get_bounding_boxes')
 def get_bounding_boxes():
     try:
+        # Update the path to output.json
         with open('output.json', 'r') as f:
             data = json.load(f)
         
@@ -35,13 +41,13 @@ def get_bounding_boxes():
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 # Ensure the static/images folder exists
-if not os.path.exists('static/images'):
-    os.makedirs('static/images')
+static_folder = os.path.join(os.path.dirname(__file__), 'static', 'images')
+if not os.path.exists(static_folder):
+    os.makedirs(static_folder)
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    return send_from_directory('static/images', filename)
+    return send_from_directory(static_folder, filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
